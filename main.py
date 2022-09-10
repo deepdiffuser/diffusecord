@@ -13,7 +13,10 @@ from discord.ext import commands
 
 
 # CONFIGURATION
-device = "cuda:0"
+device = "cuda"
+
+if os.environ["CUDA_DEVICE"] != "":
+    device = "cuda:" + os.environ["CUDA_DEVICE"]
 
 
 class DummySafetyChecker():
@@ -93,19 +96,21 @@ async def imagine(ctx, prompt: str,
 
     await ctx.defer()
 
-    img = await txt2img(pipe,
-                        prompt,
-                        seed,
-                        scale,
-                        steps,
-                        height,
-                        width)
+    try:
+        img = await txt2img(pipe,
+                            prompt,
+                            seed,
+                            scale,
+                            steps,
+                            height,
+                            width)
+        res = json.dumps({"prompt": prompt, "width": width, "height": height,
+                          "scale": scale, "steps": steps, "seed": seed})
 
-    res = json.dumps({"prompt": prompt, "width": width, "height": height,
-                     "scale": scale, "steps": steps, "seed": seed})
-
-    pic = discord.File(img, "image.png")
-    await ctx.respond(res, file=pic)
+        pic = discord.File(img, "image.png")
+        await ctx.respond(res, file=pic)
+    except:
+        await ctx.respond("error during generation, probably out of memory")
 
 
 token = os.environ["DISCORD_TOKEN"]
