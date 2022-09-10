@@ -44,16 +44,16 @@ async def txt2img(sd_pipeline, prompt: str, seed: int, scale: float, steps: int,
 
 
 pipe = None
-if os.environ["ENABLE_CENSORSHIP"] == "1":
-    # fp16 is half precision
-    pipe = StableDiffusionPipeline.from_pretrained(
-        "./stable-diffusion-v1-4", local_files_only=True, use_auth_token=False,  revision="fp16",
-        torch_dtype=torch.float16)
-else:
+if os.environ["DISABLE_CENSORSHIP"] == "1":
     # fp16 is half precision
     pipe = StableDiffusionPipeline.from_pretrained(
         "./stable-diffusion-v1-4", local_files_only=True, use_auth_token=False,  revision="fp16",
         torch_dtype=torch.float16, safety_checker=DummySafetyChecker())
+else:
+    # fp16 is half precision
+    pipe = StableDiffusionPipeline.from_pretrained(
+        "./stable-diffusion-v1-4", local_files_only=True, use_auth_token=False,  revision="fp16",
+        torch_dtype=torch.float16)
 
 pipe = pipe.to(device)
 pipe.enable_attention_slicing()
