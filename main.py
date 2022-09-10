@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import discord
+import json
 import os
 import time
 import diffusers
@@ -100,12 +101,8 @@ async def imagine(ctx, prompt: str,
                         height,
                         width)
 
-    res = "prompt: " + prompt + "\n"
-    res += "seed: " + str(seed) + "\n"
-    res += "steps: " + str(steps) + "\n"
-    res += "width: " + str(width) + "\n"
-    res += "height: " + str(height) + "\n"
-    res += "scale: " + str(scale) + "\n"
+    res = json.dumps({"prompt": prompt, "width": width, "height": height,
+                     "scale": scale, "steps": steps, "seed": seed})
 
     pic = discord.File(img, "image.png")
     await ctx.respond(res, file=pic)
